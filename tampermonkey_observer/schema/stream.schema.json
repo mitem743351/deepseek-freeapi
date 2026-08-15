@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Sanitized stream observation","type":"object","properties":{"stream_id":{"type":"string"},"scenario":{"type":["string","null"]},"transport":{"type":"string"},"content_type":{"type":"string"},"chunks":{"type":"integer"},"events":{"type":"array","items":{"type":"object"}},"raw_payloads_stored":{"const":false}}}

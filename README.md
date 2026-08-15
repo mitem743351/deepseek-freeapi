@@ -44,3 +44,6 @@ A sanitized authenticated observer export is now preserved at `deepseek_web_rese
 
 ## Phase 5 status
 The Phase 5 baseline capture is preserved at `deepseek_web_research/captures/deepseek_observation_2026-08-15T06-42-36-498Z.json`. It corroborates XHR/SSE transport and adds five marked request windows, but `stream_observations` remains empty and IndexedDB records were not sampled. Phase 5 reports therefore classify actual SSE event framing and `history-message` record structure as **NOT OBSERVABLE in this capture**, with read-only follow-up observers supplied in `devtools_observer/`.
+
+## Phase 6 status
+`tampermonkey_observer/` contains a local-only, no-grant Tampermonkey userscript with a persistent Shadow-DOM dashboard, scenario markers, passive network/storage/file/resource metadata observation, and sanitized JSON/ZIP exports. The Phase 6 baseline capture is preserved under `deepseek_web_research/captures/`. The tool deliberately reports stream payloads and cross-origin bundle bodies as not observable when safe browser access is unavailable.

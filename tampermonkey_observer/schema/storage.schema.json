@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Sanitized storage metadata","type":"object","properties":{"localStorage":{"type":"object"},"sessionStorage":{"type":"object"},"indexedDB":{"type":"object"},"cache_storage":{"type":"object"},"service_workers":{"type":"object"}}}
