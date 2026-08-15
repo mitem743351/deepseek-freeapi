@@ -11,3 +11,8 @@ No authenticated normal browser session was available; localStorage, sessionStor
 | Feature flags | Unknown | No bundle/storage capture. | UNKNOWN |
 
 No token, cookie, account identifier, personal data, cache entry, or session value is present in this repository.
+
+---
+
+## Phase 2 status
+The browser-storage inventory is still pending A02/A04 human-operated DevTools capture. `docs/phase2_browser_capture_instructions.md` specifies that only mechanism, name/category, approximate schema, and persistence attributes may be recorded. Sensitive values must be represented only as **Authentication-related value present — redacted.**
