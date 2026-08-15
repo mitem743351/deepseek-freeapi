@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><title>Passive Observer Local Smoke Demo</title>
+<style>body{font:14px system-ui;margin:2rem;max-width:55rem}button{margin:.25rem;padding:.45rem}.note{background:#fff3cd;padding:1rem}pre{background:#f4f4f4;padding:1rem}</style>
+<h1>Passive Observer local smoke demo</h1>
+<p class="note">This page is not DeepSeek and sends no network traffic outside the browser. To test fake EventSource/WebSocket interception, click <b>Install fake transports</b> <em>before</em> pasting the observer, then paste the observer in this page's DevTools Console. The fake transports use in-memory events only.</p>
+<button onclick="installFakeTransports()">Install fake transports</button>
+<button onclick="fetchJson()">fetch JSON (data URL)</button>
+<button onclick="fetchStream()">fetch stream-shaped text (Blob URL)</button>
+<button onclick="xhrJson()">XHR JSON (data URL)</button>
+<button onclick="eventSourceDemo()">Fake EventSource</button>
+<button onclick="webSocketDemo()">Fake WebSocket</button>
+<button onclick="storageDemo()">Storage + IndexedDB</button>
+<label>File input <input id="file" type="file"></label>
+<pre id="out"></pre>
+<script>
+const out=x=>document.querySelector('#out').textContent+=x+'\n';
+function installFakeTransports(){
+ class FakeEventSource extends EventTarget { constructor(url){ super();this.url=url;this.readyState=0;setTimeout(()=>{this.readyState=1;this.dispatchEvent(new Event('open'));this.dispatchEvent(new MessageEvent('message',{data:'{"type":"demo","data":{"ok":true}}',lastEventId:'1'}));},20)} close(){this.readyState=2} }
+ class FakeWebSocket extends EventTarget { constructor(url,protocols){super();this.url=url;this.protocol=Array.isArray(protocols)?protocols[0]||'':protocols||'';this.readyState=0;setTimeout(()=>{this.readyState=1;this.dispatchEvent(new Event('open'));this.dispatchEvent(new MessageEvent('message',{data:'{"type":"demo","data":{"ok":true}}'}));},25)} send(){} close(){this.readyState=3;this.dispatchEvent(new CloseEvent('close',{code:1000,reason:'demo'}))} }
+ FakeEventSource.CONNECTING=0;FakeEventSource.OPEN=1;FakeEventSource.CLOSED=2;FakeWebSocket.CONNECTING=0;FakeWebSocket.OPEN=1;FakeWebSocket.CLOSING=2;FakeWebSocket.CLOSED=3;window.EventSource=FakeEventSource;window.WebSocket=FakeWebSocket;out('Fake in-memory transports installed. Paste observer now.');
+}
+async function fetchJson(){const r=await fetch('data:application/json,{"status":"ok","data":{"id":"demo"}}');out(await r.text())}
+async function fetchStream(){const u=URL.createObjectURL(new Blob(['data: {"type":"demo"}\n\ndata: [DONE]\n\n'],{type:'text/event-stream'}));const r=await fetch(u);out(await r.text());URL.revokeObjectURL(u)}
+function xhrJson(){const x=new XMLHttpRequest();x.open('GET','data:application/json,{"status":"ok"}');x.onload=()=>out(x.responseText);x.send()}
+function eventSourceDemo(){const e=new EventSource('/demo-sse');setTimeout(()=>e.close(),100)}
+function webSocketDemo(){const w=new WebSocket('wss://demo.invalid/socket',['demo']);setTimeout(()=>w.close(),100)}
+function storageDemo(){localStorage.setItem('demo_ui_theme','dark');sessionStorage.setItem('demo_session_note','safe');const r=indexedDB.open('observer-demo',1);r.onupgradeneeded=()=>r.result.createObjectStore('events',{keyPath:'id'});r.onsuccess=()=>{r.result.close();out('Storage created; run DeepSeekObserver.inspectStorage()')}}
+</script>

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeepSeek Web Passive Observer export",
+  "description": "Sanitized local-only observation export. Credential values, full private conversations, and file contents are forbidden.",
+  "type": "object",
+  "required": ["metadata", "endpoint_inventory", "scenarios", "operations", "stream_observations", "storage_schema", "attachment_observations"],
+  "properties": {
+    "metadata": {"type": "object"},
+    "endpoint_inventory": {"type": "array", "items": {"type": "object", "required": ["id", "method", "origin", "path", "observed_count"]}},
+    "scenarios": {"type": "array", "items": {"type": "object", "required": ["id", "label", "started_at"]}},
+    "operations": {"type": "array", "items": {"type": "object", "required": ["id", "timestamp", "transport", "method", "url_origin", "url_path", "classification"]}},
+    "stream_observations": {"type": "array", "items": {"type": "object", "required": ["status", "transport", "chunks", "framing"]}},
+    "storage_schema": {"type": "object"},
+    "attachment_observations": {"type": "array"},
+    "message_conversation_candidates": {"type": "array"},
+    "performance_entries": {"type": "array"}
+  }
+}

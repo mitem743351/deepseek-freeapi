@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "observer": "DeepSeek Web Passive Observer",
+    "version": "1.0.0",
+    "exported_at": "2026-08-15T00:00:00.000Z",
+    "local_only": true,
+    "safety": "No requests were generated, replayed, modified, or transmitted by the observer."
+  },
+  "endpoint_inventory": [{
+    "id": "EP-001", "method": "POST", "origin": "https://chat.example.invalid", "path": "/example",
+    "observed_count": 1, "content_types": ["application/json"],
+    "streaming": {"status": "OBSERVED", "transport": "fetch-readable-stream-candidate"},
+    "request_schema": {"type": "object", "keys": {"message": {"type": "string", "length": 42}}},
+    "response_schema": null, "scenarios": ["SCENARIO-001"], "classification": "OBSERVED"
+  }],
+  "scenarios": [{"id": "SCENARIO-001", "label": "B02_SEND_MESSAGE", "started_at": "2026-08-15T00:00:00.000Z", "ended_at": "2026-08-15T00:00:02.000Z", "operation_ids": ["OP-0001"], "status": "OBSERVED_MARKER"}],
+  "operations": [{"id": "OP-0001", "timestamp": "2026-08-15T00:00:00.000Z", "transport": "fetch", "method": "POST", "url_origin": "https://chat.example.invalid", "url_path": "/example", "query_keys": [], "request_headers": ["content-type", "<REDACTED_AUTH_HEADER>"], "request_body": {"classification": "json", "schema": {"type": "object", "keys": {"message": {"type": "string", "length": 42}}}}, "response_content_type": "text/event-stream", "status": 200, "duration_ms": 10, "initiator": "window.fetch", "streaming_candidate": true, "classification": "OBSERVED"}],
+  "stream_observations": [{"status": "OBSERVED", "operation_id": "OP-0001", "transport": "fetch-readable-stream", "content_type": "text/event-stream", "chunks": 3, "chunk_sizes": [12, 15, 14], "timings_ms": [2, 8, 12], "framing": "SSE_LIKE_OBSERVED", "events": [{"shape": {"type": "object", "keys": {"type": {"type": "string", "length": 4}, "data": {"type": "object", "keys": {}}}}}], "completion_signal": "data_DONE", "error_pattern": "UNKNOWN", "truncated": false}],
+  "storage_schema": {"inspected_at": "2026-08-15T00:00:00.000Z", "localStorage": {"status": "OBSERVED", "mechanism": "localStorage", "persistent": true, "entries": [{"key": "auth-related-key", "classification": "AUTHENTICATION_RELATED", "value_type": "string", "size": 200, "value": "<REDACTED>"}]}},
+  "attachment_observations": [], "message_conversation_candidates": [], "performance_entries": [], "errors": []
+}
