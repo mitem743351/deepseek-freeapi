@@ -41,3 +41,6 @@ Phase 3 did not obtain authenticated runtime evidence because a normal account-o
 
 ## Phase 4 status
 A sanitized authenticated observer export is now preserved at `deepseek_web_research/captures/deepseek_observation_2026-08-15T06-26-16-686Z.json`. Phase 4 reports use this as their primary evidence source. It establishes observed XHR completion, SSE content type, session/admission/file operations, and storage metadata while keeping SSE event payloads, stop/regenerate behavior, history-record schemas, and backend internals explicitly unknown. See `reports/phase4_final_protocol_assessment.md`.
+
+## Phase 5 status
+The Phase 5 baseline capture is preserved at `deepseek_web_research/captures/deepseek_observation_2026-08-15T06-42-36-498Z.json`. It corroborates XHR/SSE transport and adds five marked request windows, but `stream_observations` remains empty and IndexedDB records were not sampled. Phase 5 reports therefore classify actual SSE event framing and `history-message` record structure as **NOT OBSERVABLE in this capture**, with read-only follow-up observers supplied in `devtools_observer/`.
