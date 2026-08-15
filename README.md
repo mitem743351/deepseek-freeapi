@@ -31,3 +31,10 @@ deepseek_web_research/
 
 ## Known limitations
 This environment cannot create a normal account-owner browser session. Until the owner completes the Phase 2 capture matrix, authenticated web flows, storage, streaming, files, search, and client/server boundaries remain unknown—not guessed.
+
+## Phase 3 status
+Phase 3 did not obtain authenticated runtime evidence because a normal account-owner browser session was not safely available in this environment. The indicated credential-bearing attachment was not read, copied, or used. No cookie replay or automated authenticated traffic was created. `deepseek_web_research/docs/phase3_execution_status.md` documents the decision; Phase 3 deliverables preserve UNKNOWN rather than fabricate browser behavior.
+
+**Captured scenarios:** none.
+**Evidence coverage:** public Phase 1 evidence and developer API documentation only; no consumer-web authenticated network/storage/event evidence.
+**Remaining unknowns:** authenticated operations, conversation lifecycle, streaming, browser storage, uploads, search, sharing, and client/server boundaries.

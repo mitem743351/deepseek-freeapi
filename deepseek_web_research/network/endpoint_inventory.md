@@ -9,3 +9,6 @@ No authenticated endpoint has been observed in repository evidence. Do not popul
 **Finding:** The inventory is empty rather than speculative.
 **Evidence:** No Phase 2 authenticated scenario is complete.
 **Confidence:** HIGH.
+
+## Phase 3 status
+No entry was added because no authenticated normal-browser request was captured. The indicated session material was intentionally not replayed or inspected. See `docs/phase3_execution_status.md`.

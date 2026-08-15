@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Observed web message v3","description":"No authenticated DeepSeek Web message structure has been observed. This schema intentionally accepts no instances; revise only from sanitized scenario evidence.","not":{}}
