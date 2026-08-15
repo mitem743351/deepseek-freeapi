@@ -1,0 +1,12 @@
+[
+  {
+    "url": "https://chat.deepseek.com/robots.txt",
+    "type": "robots",
+    "http_status": 200,
+    "content_type": "text/plain",
+    "size": 32,
+    "hash_sha256": "9bf388794a595893e7c1048c694422929d864847f339f7e39554caa657ccefa0",
+    "source": "public_browser_resource",
+    "stored_as": "raw/robots.txt"
+  }
+]
