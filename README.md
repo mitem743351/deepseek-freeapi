@@ -38,3 +38,6 @@ Phase 3 did not obtain authenticated runtime evidence because a normal account-o
 **Captured scenarios:** none.
 **Evidence coverage:** public Phase 1 evidence and developer API documentation only; no consumer-web authenticated network/storage/event evidence.
 **Remaining unknowns:** authenticated operations, conversation lifecycle, streaming, browser storage, uploads, search, sharing, and client/server boundaries.
+
+## Phase 4 status
+A sanitized authenticated observer export is now preserved at `deepseek_web_research/captures/deepseek_observation_2026-08-15T06-26-16-686Z.json`. Phase 4 reports use this as their primary evidence source. It establishes observed XHR completion, SSE content type, session/admission/file operations, and storage metadata while keeping SSE event payloads, stop/regenerate behavior, history-record schemas, and backend internals explicitly unknown. See `reports/phase4_final_protocol_assessment.md`.

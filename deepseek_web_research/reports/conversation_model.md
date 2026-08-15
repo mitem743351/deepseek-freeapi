@@ -43,3 +43,11 @@ No authenticated conversation capture exists. The Phase 1 conceptual desktop mod
 **Finding:** No observable consumer-web field can be added without a completed sanitized scenario.
 **Evidence:** Phase 2 scenario records are pending.
 **Confidence:** HIGH.
+
+---
+
+## Phase 4 evidence update
+
+**Observed request shape:** `parent_message_id` is null in three captured completion requests and number-typed in eight. `ref_file_ids` is an array (empty in nine, one string-shaped item in two). The capture does not retain the numeric/string values, assistant message IDs, or response event objects.
+
+**Classification:** OBSERVED field types; INFERRED conceptual parent-reference relationship; UNKNOWN branch/database semantics. See `reports/conversation_lifecycle_v4.md`.

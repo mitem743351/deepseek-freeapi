@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Conceptual observed-request parent model v4",
+  "description": "A sanitized client request model. It does not claim a server database schema or identify numeric parent values.",
+  "type": "object",
+  "required": [
+    "prompt",
+    "parent_message_id",
+    "ref_file_ids",
+    "thinking_enabled",
+    "search_enabled",
+    "action",
+    "preempt"
+  ],
+  "properties": {
+    "parent_message_id": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Observed request type only; semantics are inferred/unknown."
+    },
+    "model_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Observed nullable type; model identity not captured."
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Observed field; content must not be stored."
+    },
+    "ref_file_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Observed empty or one-string shape in this capture."
+    },
+    "thinking_enabled": {
+      "type": "boolean"
+    },
+    "search_enabled": {
+      "type": "boolean"
+    },
+    "action": {
+      "type": "null",
+      "description": "Only null was observed in Phase 4."
+    },
+    "preempt": {
+      "type": "boolean"
+    }
+  }
+}

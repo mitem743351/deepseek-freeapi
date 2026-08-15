@@ -83,7 +83,7 @@
     const key = `${op.method}|${op.url_origin}|${op.url_path}`;
     let e = state.endpointInventory.get(key);
     if (!e) { e = { id: `EP-${String(++state.endpointSequence).padStart(3, '0')}`, method: op.method, origin: op.url_origin, path: op.url_path, observed_count: 0, content_types: [], streaming: { status: 'UNKNOWN' }, request_schema: null, response_schema: null, scenarios: [], classification: 'OBSERVED' }; state.endpointInventory.set(key, e); }
-    e.observed_count++; if (op.request_content_type !== 'UNKNOWN' && !e.content_types.includes(op.request_content_type)) e.content_types.push(op.request_content_type);
+    if (!op._endpointRegistered) { e.observed_count++; op._endpointRegistered = true; } if (op.request_content_type !== 'UNKNOWN' && !e.content_types.includes(op.request_content_type)) e.content_types.push(op.request_content_type);
     if (op.response_content_type && op.response_content_type !== 'UNKNOWN' && !e.content_types.includes(op.response_content_type)) e.content_types.push(op.response_content_type);
     if (op.request_body && !e.request_schema) e.request_schema = op.request_body.schema;
     if (op.response_schema && !e.response_schema) e.response_schema = op.response_schema;
@@ -95,7 +95,7 @@
     const pathHit = MESSAGE_WORDS.test(op.url_path), schemaText = JSON.stringify(op.request_body && op.request_body.schema || '');
     const bodyHit = MESSAGE_WORDS.test(schemaText), streamHit = !!op.streaming_candidate;
     const classification = pathHit && (bodyHit || streamHit) ? 'OBSERVED_MESSAGE_OPERATION' : (pathHit || bodyHit || streamHit) ? 'POSSIBLE_MESSAGE_OPERATION' : 'UNRELATED';
-    if (classification !== 'UNRELATED') state.schemas.messageCandidates.push({ operation_id: op.id, endpoint_id: op.endpoint_id, classification, evidence: { path_keyword: pathHit, payload_shape_keyword: bodyHit, streaming_candidate: streamHit }, request_schema: op.request_body && op.request_body.schema || null, response_schema: op.response_schema || null });
+    if (classification !== 'UNRELATED' && !op._candidateRecorded) { state.schemas.messageCandidates.push({ operation_id: op.id, endpoint_id: op.endpoint_id, classification, evidence: { path_keyword: pathHit, payload_shape_keyword: bodyHit, streaming_candidate: streamHit }, request_schema: op.request_body && op.request_body.schema || null, response_schema: op.response_schema || null }); op._candidateRecorded = true; }
   };
   const addOp = (op) => { if (!active()) return null; op.id = `OP-${String(++state.sequence).padStart(4, '0')}`; op.timestamp = now(); op.scenario = currentScenarioId(); op.classification = 'OBSERVED'; state.operations.push(op); endpoint(op); candidate(op); log(new Date().toLocaleTimeString(), 'REQUEST', op.transport.toUpperCase(), op.method, op.url_path); return op; };
   const updateOp = (op, patch) => { if (!op) return; Object.assign(op, patch); endpoint(op); candidate(op); };
