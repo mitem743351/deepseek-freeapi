@@ -1,0 +1,13 @@
+{
+  "theme": "dark",
+  "default_model": "deepseek-v4-flash",
+  "thinking_enabled": false,
+  "search_enabled": false,
+  "font_size": 13,
+  "window_width": 1200,
+  "window_height": 750,
+  "auto_save_chats": true,
+  "show_timestamps": true,
+  "stream_speed": "normal",
+  "app_version": "1.0.0"
+}

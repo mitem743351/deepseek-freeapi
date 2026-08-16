@@ -1,0 +1,27 @@
+# DeepSeek Desktop - Requirements
+# Install with: pip install -r requirements.txt
+
+# Core DeepSeek Web Integration
+p2d-deepseek
+
+# GUI Framework
+customtkinter>=5.2.0
+
+# Image handling
+Pillow>=10.0.0
+
+# Markdown rendering
+markdown>=3.5.0
+
+# Syntax highlighting
+pygments>=2.16.0
+
+# HTML rendering in tkinter
+tkinterweb>=3.23.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# HTTP client (used internally by p2d-deepseek)
+httpx>=0.25.0
+requests>=2.31.0
