@@ -1,4 +1,4 @@
-"""Application-wide dark, light, and system appearance management."""
+"""Application-wide premium color system and appearance management."""
 
 from __future__ import annotations
 
@@ -16,28 +16,92 @@ VALID_THEMES = {"dark", "light", "system"}
 DEFAULT_THEME = "dark"
 
 DARK: dict[str, str] = {
-    "bg_primary": "#1A1A1A",
-    "bg_secondary": "#2B2B2B",
-    "bg_input": "#2B2B2B",
-    "text_primary": "#FFFFFF",
-    "text_secondary": "#AAAAAA",
-    "user_bubble": "#1E90FF",
-    "assistant_bubble": "#2B2B2B",
-    "accent": "#1E90FF",
-    "border": "#3A3A3A",
+    "layer_0": "#0F0F0F",
+    "layer_1": "#141414",
+    "layer_2": "#1A1A1A",
+    "layer_3": "#1F1F1F",
+    "layer_4": "#252525",
+    "layer_5": "#2C2C2C",
+    "layer_6": "#333333",
+    "accent_blue": "#4F9EF8",
+    "accent_blue_dim": "#1D4ED8",
+    "accent_green": "#34D399",
+    "accent_purple": "#A78BFA",
+    "accent_red": "#F87171",
+    "accent_orange": "#FB923C",
+    "text_primary": "#F0F0F0",
+    "text_secondary": "#909090",
+    "text_tertiary": "#555555",
+    "user_bubble_bg": "#1E3A5F",
+    "user_bubble_border": "#2D5A9E",
+    "user_bubble_text": "#E8F4FF",
+    "bot_bubble_bg": "#1F1F1F",
+    "bot_bubble_border": "#2A2A2A",
+    "bot_bubble_text": "#E8E8E8",
+    "scrollbar_thumb": "#333333",
+    "scrollbar_hover": "#444444",
+    "sidebar_divider": "#222222",
+    "think_tint": "#2D1F4E",
+    "search_tint": "#0F2D1F",
+    "info_bg": "#1A2744",
+    "info_border": "#2D5A9E",
+    "info_text": "#93C5FD",
+    "success_bg": "#0F2D1F",
+    "code_bg": "#0D1117",
+    "code_header": "#161B22",
+    "code_button": "#21262D",
+    "code_button_hover": "#30363D",
+    "code_text": "#E6EDF3",
+    "code_meta": "#8B949E",
+    "white": "#FFFFFF",
 }
 
 LIGHT: dict[str, str] = {
-    "bg_primary": "#F5F5F5",
-    "bg_secondary": "#FFFFFF",
-    "bg_input": "#FFFFFF",
-    "text_primary": "#000000",
-    "text_secondary": "#666666",
-    "user_bubble": "#0078FF",
-    "assistant_bubble": "#EFEFEF",
-    "accent": "#0078FF",
-    "border": "#DDDDDD",
+    "layer_0": "#F8F9FA",
+    "layer_1": "#F0F2F5",
+    "layer_2": "#FFFFFF",
+    "layer_3": "#F5F6F8",
+    "layer_4": "#FFFFFF",
+    "layer_5": "#E8EAED",
+    "layer_6": "#D1D5DB",
+    "accent_blue": "#2563EB",
+    "accent_blue_dim": "#1D4ED8",
+    "accent_green": "#059669",
+    "accent_purple": "#7C3AED",
+    "accent_red": "#DC2626",
+    "accent_orange": "#D97706",
+    "text_primary": "#111111",
+    "text_secondary": "#6B7280",
+    "text_tertiary": "#9CA3AF",
+    "user_bubble_bg": "#2563EB",
+    "user_bubble_border": "#1D4ED8",
+    "user_bubble_text": "#FFFFFF",
+    "bot_bubble_bg": "#F9FAFB",
+    "bot_bubble_border": "#E5E7EB",
+    "bot_bubble_text": "#111111",
+    "scrollbar_thumb": "#CBD5E1",
+    "scrollbar_hover": "#94A3B8",
+    "sidebar_divider": "#D1D5DB",
+    "think_tint": "#F3E8FF",
+    "search_tint": "#ECFDF5",
+    "info_bg": "#EFF6FF",
+    "info_border": "#BFDBFE",
+    "info_text": "#1D4ED8",
+    "success_bg": "#F0FDF4",
+    "code_bg": "#0D1117",
+    "code_header": "#161B22",
+    "code_button": "#21262D",
+    "code_button_hover": "#30363D",
+    "code_text": "#E6EDF3",
+    "code_meta": "#8B949E",
+    "white": "#FFFFFF",
 }
+
+
+def color_pair(key: str) -> tuple[str, str]:
+    """Return a CustomTkinter ``(light, dark)`` tuple for a palette key."""
+    fallback = DARK.get(key, DARK["text_primary"])
+    return (LIGHT.get(key, fallback), DARK.get(key, fallback))
 
 
 class ThemeManager:
@@ -85,6 +149,11 @@ class ThemeManager:
         """Return the configured theme name."""
         return self._current_theme
 
+    def get_color(self, key: str) -> str:
+        """Return one active-theme color, falling back to the dark palette."""
+        active = DARK if self.is_dark_mode() else LIGHT
+        return active.get(key, DARK.get(key, DARK["text_primary"]))
+
     def is_dark_mode(self) -> bool:
         """Return whether CustomTkinter is currently rendering in dark mode."""
         if self._current_theme == "system":
@@ -92,7 +161,7 @@ class ThemeManager:
         return self._current_theme == "dark"
 
     def get_colors(self) -> dict[str, str]:
-        """Return a copy of the palette for the active appearance."""
+        """Return a copy of the active premium color palette."""
         return dict(DARK if self.is_dark_mode() else LIGHT)
 
     def register_listener(self, callback: Callable[[], None]) -> None:

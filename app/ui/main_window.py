@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import queue
+import sys
 from datetime import datetime
 from pathlib import Path
-from tkinter import messagebox
 from typing import Any
 
 import customtkinter as ctk
@@ -22,7 +22,7 @@ from app.ui.topbar import MODELS, Topbar
 from app.utils.config import ConfigManager
 from app.utils.database import DatabaseError, DatabaseManager
 from app.utils.helpers import estimate_tokens, resource_path, truncate_text
-from app.utils.theme_manager import ThemeManager
+from app.utils.theme_manager import ThemeManager, color_pair
 
 WINDOW_TITLE = "DeepSeek Desktop"
 DEFAULT_WINDOW_WIDTH = 1200
@@ -30,7 +30,22 @@ DEFAULT_WINDOW_HEIGHT = 750
 MIN_WINDOW_WIDTH = 900
 MIN_WINDOW_HEIGHT = 550
 SIDEBAR_WIDTH = 260
-INPUT_AREA_HEIGHT = 120
+INPUT_AREA_HEIGHT = 110
+NOTICE_WIDTH = 420
+NOTICE_HEIGHT = 180
+NOTICE_OK_TEXT = "OK"
+FONT_FAMILY = (
+    "Segoe UI"
+    if sys.platform.startswith("win")
+    else "SF Pro Display"
+    if sys.platform == "darwin"
+    else "Inter"
+)
+FONT_UI = (FONT_FAMILY, 13)
+FONT_UI_BOLD = (FONT_FAMILY, 13, "bold")
+FONT_SMALL = (FONT_FAMILY, 11)
+FONT_MONO = ("JetBrains Mono", 12)
+FONT_TITLE = (FONT_FAMILY, 14, "bold")
 QUEUE_POLL_INTERVAL = 50
 MAX_QUEUE_EVENTS_PER_POLL = 100
 NEW_CHAT_TITLE = "New Conversation"
@@ -75,6 +90,7 @@ class MainWindow(ctk.CTk):
         self._thinking_content: str | None = None
         self._conversation_token_total = 0
         self._icon_image: ImageTk.PhotoImage | None = None
+        self._notice_dialog: ctk.CTkToplevel | None = None
 
         self.title(WINDOW_TITLE)
         width = max(
@@ -87,7 +103,7 @@ class MainWindow(ctk.CTk):
         )
         self.geometry(f"{width}x{height}")
         self.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
-        self.configure(fg_color=("#F5F5F5", "#1A1A1A"))
+        self.configure(fg_color=color_pair("layer_0"))
         self._set_window_icon()
 
         self.grid_columnconfigure(0, weight=0, minsize=SIDEBAR_WIDTH)
@@ -96,14 +112,33 @@ class MainWindow(ctk.CTk):
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=0, minsize=INPUT_AREA_HEIGHT)
 
-        self.topbar = Topbar(self, self.theme_manager, default_model=default_model)
-        self.topbar.grid(row=0, column=0, columnspan=2, sticky="ew")
         self.sidebar = Sidebar(self, self.database_manager)
-        self.sidebar.grid(row=1, column=0, rowspan=2, sticky="nsew")
+        self.sidebar.grid(row=0, column=0, rowspan=3, sticky="nsew")
+        self.topbar = Topbar(self, self.theme_manager, default_model=default_model)
+        self.topbar.grid(row=0, column=1, sticky="ew")
         self.chat_frame = ChatFrame(self, self.theme_manager, self.config_manager)
-        self.chat_frame.grid(row=1, column=1, sticky="nsew")
+        self.chat_frame.grid(
+            row=1,
+            column=1,
+            padx=(0, 0),
+            pady=(0, 0),
+            sticky="nsew",
+        )
         self.input_frame = InputFrame(self, self.on_send, self.config_manager)
         self.input_frame.grid(row=2, column=1, sticky="nsew")
+        self.sidebar_divider = ctk.CTkFrame(
+            self,
+            width=1,
+            corner_radius=0,
+            fg_color=color_pair("sidebar_divider"),
+        )
+        self.sidebar_divider.grid(
+            row=0,
+            column=0,
+            rowspan=3,
+            sticky="nse",
+        )
+        self.sidebar_divider.lift()
 
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
@@ -221,7 +256,7 @@ class MainWindow(ctk.CTk):
                     self.topbar.set_model(model)
             return True
         except (DatabaseError, ValueError) as exc:
-            messagebox.showerror(ERROR_TITLE, str(exc), parent=self)
+            self.show_notice(ERROR_TITLE, str(exc), kind="error")
             self.sidebar.refresh_conversations()
             return False
 
@@ -247,7 +282,7 @@ class MainWindow(ctk.CTk):
             self.input_frame.enable_input()
             return True
         except DatabaseError as exc:
-            messagebox.showerror(ERROR_TITLE, str(exc), parent=self)
+            self.show_notice(ERROR_TITLE, str(exc), kind="error")
             return False
 
     def on_model_change(self, model: str) -> None:
@@ -265,7 +300,7 @@ class MainWindow(ctk.CTk):
             if conv_id:
                 self.database_manager.update_conversation_model(conv_id, model)
         except (ValueError, DatabaseError) as exc:
-            messagebox.showerror(ERROR_TITLE, str(exc), parent=self)
+            self.show_notice(ERROR_TITLE, str(exc), kind="error")
 
     def update_auth_token(self, token: str) -> bool:
         """Replace the active p2d client after the user saves a new token."""
@@ -312,6 +347,77 @@ class MainWindow(ctk.CTk):
         )
         return self.config_manager.save_all(settings)
 
+    def show_notice(self, title: str, message: str, kind: str = "info") -> None:
+        """Display a modern CTk-only notice for errors, warnings, and information."""
+        if self._closing:
+            return
+        if self._notice_dialog is not None:
+            try:
+                self._notice_dialog.destroy()
+            except Exception:
+                pass
+        dialog = ctk.CTkToplevel(self)
+        self._notice_dialog = dialog
+        dialog.title(title)
+        dialog.geometry(f"{NOTICE_WIDTH}x{NOTICE_HEIGHT}")
+        dialog.resizable(False, False)
+        dialog.configure(fg_color=color_pair("layer_2"))
+        dialog.transient(self)
+        dialog.grid_columnconfigure(0, weight=1)
+        color_key = {
+            "error": "accent_red",
+            "warning": "accent_orange",
+            "success": "accent_green",
+        }.get(kind, "accent_blue")
+        heading = ctk.CTkLabel(
+            dialog,
+            text=title,
+            anchor="w",
+            text_color=color_pair(color_key),
+            font=ctk.CTkFont(family=FONT_FAMILY, size=15, weight="bold"),
+        )
+        heading.grid(row=0, column=0, padx=20, pady=(20, 7), sticky="ew")
+        body = ctk.CTkLabel(
+            dialog,
+            text=message,
+            anchor="w",
+            justify="left",
+            wraplength=376,
+            text_color=color_pair("text_secondary"),
+            font=ctk.CTkFont(family=FONT_FAMILY, size=11),
+        )
+        body.grid(row=1, column=0, padx=20, sticky="ew")
+
+        def close_notice() -> None:
+            """Release and destroy the active notice dialog."""
+            try:
+                dialog.grab_release()
+            except Exception:
+                pass
+            dialog.destroy()
+            if self._notice_dialog is dialog:
+                self._notice_dialog = None
+
+        ok_button = ctk.CTkButton(
+            dialog,
+            text=NOTICE_OK_TEXT,
+            width=76,
+            height=32,
+            corner_radius=8,
+            fg_color=color_pair("accent_blue"),
+            hover_color=color_pair("accent_blue_dim"),
+            text_color=color_pair("white"),
+            font=ctk.CTkFont(family=FONT_FAMILY, size=11, weight="bold"),
+            command=close_notice,
+        )
+        ok_button.grid(row=2, column=0, padx=20, pady=(15, 18), sticky="e")
+        dialog.protocol("WM_DELETE_WINDOW", close_notice)
+        self.update_idletasks()
+        x_pos = self.winfo_rootx() + max(0, (self.winfo_width() - NOTICE_WIDTH) // 2)
+        y_pos = self.winfo_rooty() + max(0, (self.winfo_height() - NOTICE_HEIGHT) // 2)
+        dialog.geometry(f"{NOTICE_WIDTH}x{NOTICE_HEIGHT}+{x_pos}+{y_pos}")
+        dialog.after(30, dialog.grab_set)
+
     def _handle_stream_token(self, token: str) -> None:
         """Append one streamed answer chunk to a main-thread message bubble."""
         if not token:
@@ -327,18 +433,19 @@ class MainWindow(ctk.CTk):
         self.chat_frame.hide_loading()
         full_text = str(event.get("content", ""))
         cancelled = bool(event.get("cancelled", False))
+        thinking_content = event.get("thinking_content") or self._thinking_content
         if full_text:
             if self._assistant_bubble is None:
                 self._assistant_bubble = self.chat_frame.add_deepseek_message(full_text)
             else:
                 self._assistant_bubble.set_text(full_text, finalize=True)
+            if thinking_content:
+                self._assistant_bubble.set_thinking_content(str(thinking_content))
             self._assistant_bubble.finalize()
         elif not cancelled:
             self._assistant_bubble = self.chat_frame.add_deepseek_message(
                 EMPTY_RESPONSE_MESSAGE
             )
-
-        thinking_content = event.get("thinking_content") or self._thinking_content
         if not cancelled and full_text and self._stream_conversation_id:
             try:
                 if bool(self.config_manager.get("auto_save_chats", True)):
@@ -351,7 +458,7 @@ class MainWindow(ctk.CTk):
                 self.sidebar.refresh_conversations()
                 self.sidebar.set_active(self._stream_conversation_id)
             except DatabaseError as exc:
-                messagebox.showerror(ERROR_TITLE, str(exc), parent=self)
+                self.show_notice(ERROR_TITLE, str(exc), kind="error")
 
         session_id = event.get("session_id")
         message_id = event.get("message_id")
@@ -400,7 +507,7 @@ class MainWindow(ctk.CTk):
 
     def _show_streaming_warning(self) -> None:
         """Tell the user why navigation is temporarily unavailable."""
-        messagebox.showinfo(ERROR_TITLE, STREAMING_WARNING, parent=self)
+        self.show_notice(ERROR_TITLE, STREAMING_WARNING, kind="warning")
 
     def _set_window_icon(self) -> None:
         """Apply the bundled ICO icon with a PNG fallback across platforms."""
